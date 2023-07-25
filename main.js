@@ -7,6 +7,8 @@ const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerH
 
 const renderer = new THREE.WebGLRenderer()
 
+renderer.shadowMap.enabled = true
+
 renderer.setSize(window.innerWidth, window.innerHeight)
 document.body.appendChild(renderer.domElement)
 
@@ -18,18 +20,21 @@ const axesHelper = new THREE.AxesHelper(5)
 scene.add(axesHelper)
 
 // Green Cube
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-const cube = new THREE.Mesh(geometry, material)
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
+const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+const cube = new THREE.Mesh(boxGeometry, material)
 scene.add(cube)
+cube.receiveShadow = true
+cube.castShadow = true
+
 
 // Sphere
 const sphereGeometry = new THREE.SphereGeometry(4)
-const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true })
+const sphereMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff, wireframe: false })
 const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
 scene.add(sphere)
 sphere.position.set(-10, 10, 0)
-
+sphere.castShadow = true
 
 // Setting Camera Position to view the objects from different angles and distance
 // camera.position.z = 5;
@@ -38,14 +43,34 @@ orbit.update()
 
 // Plane
 const planeGeometry = new THREE.PlaneGeometry(30, 30)
-const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })
+const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide })
 const plane = new THREE.Mesh(planeGeometry, planeMaterial)
 scene.add(plane)
 plane.rotation.x = -0.5 * Math.PI
+plane.receiveShadow = true
 
 // Grid Helper
 const gridHelper = new THREE.GridHelper(30)
 scene.add(gridHelper)
+
+// LIGHTS
+
+// Ambient Light
+const ambientLight = new THREE.AmbientLight(0x333333)
+scene.add(ambientLight)
+
+// Directional Light
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
+scene.add(directionalLight)
+directionalLight.position.set(-30, 50, 0)
+directionalLight.castShadow = true
+directionalLight.shadow.camera.bottom = -12
+
+const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5)
+scene.add(directionalLightHelper)
+
+const directionalLightShadowHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
+scene.add(directionalLightShadowHelper)
 
 // Dat GUI
 const gui = new dat.GUI()
